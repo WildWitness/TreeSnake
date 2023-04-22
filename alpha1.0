@@ -1,0 +1,28 @@
+pip install scapy
+
+#!/usr/bin/env python3
+
+import argparse
+from scapy.all import sniff, Dot11
+
+def process_packet(packet):
+    if packet.haslayer(Dot11):
+        if packet.type == 0 and packet.subtype == 8:
+            ssid = packet.info.decode('utf-8')
+            bssid = packet.addr2
+            channel = int(ord(packet[Dot11Elt:3].info))
+            print(f"AP found: {bssid} - SSID: {ssid} - Channel: {channel}")
+
+def main(interface):
+    print("Starting Wi-Fi scan...")
+    sniff(iface=interface, prn=process_packet)
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description="Lightweight Wi-Fi Scanning Tool")
+    parser.add_argument("-i", "--interface", help="Network interface to use for scanning", required=True)
+    args = parser.parse_args()
+
+    try:
+        main(args.interface)
+    except KeyboardInterrupt:
+        print("\nInterrupted. Exiting...")
